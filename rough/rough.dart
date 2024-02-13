@@ -1,32 +1,51 @@
-void main(List<String> args) {
-   Map<String, Function> result = math(40); 
+import 'dart:io';
 
-  print(result["delhi"]!(
-      10, 20)); 
+class FileProcessingException implements Exception {
+  final String message;
 
-  print(result["mumbai"]!(10, 20));
-  // print(result["Hyderabad"]!(10, 20));
-  print(result["Bangalore"]!(10, 20));
+  FileProcessingException(this.message);
+
+  @override
+  String toString() => 'FileProcessingException: $message';
 }
 
-Map<String, Function> math(int a) {
-  int b = 30;
+class DataObject {
+  // Define your data structure here
+}
 
-  Function add = (int x, int y) {
-    return x + y + a + b;
-  };
+List<DataObject> readFileAndParse(String filePath) {
+  List<DataObject> dataObjects = [];
 
-  Function sub = (int x, int y) {
-    return x - y - a - b;
-  };
+  try {
+    File file = File(filePath);
+    if (!file.existsSync()) {
+      throw FileProcessingException("File not found: $filePath");
+    }
 
-  Function mul = (int x, int y) {
-    return x * y * a * b;
-  };
+    List<String> lines = file.readAsLinesSync();
+    for (String line in lines) {
+      try {
+        // Parse each line and create DataObject instances
+        // Example: dataObjects.add(parseLine(line));
+      } catch (e) {
+        throw FileProcessingException("Error parsing line: $line");
+      }
+    }
+  } on FileSystemException catch (e) {
+    throw FileProcessingException("File system error: ${e.message}");
+  } on FormatException catch (e) {
+    throw FileProcessingException("Error parsing file: ${e.message}");
+  }
 
-  Function div = (int x, int y) {
-    return (x / y)/a;
-  };
+  return dataObjects;
+}
 
-  return {"delhi": add, "mumbai": sub, "Bangalore": mul, "Hyderabad": div};
+void main() {
+  try {
+    List<DataObject> data = readFileAndParse("input.txt");
+    // Process the data as needed
+  } catch (e) {
+    print("Error: $e");
+    // Handle the error gracefully, possibly log it or inform the user
+  }
 }
